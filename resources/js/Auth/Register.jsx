@@ -166,8 +166,12 @@ const [checkFieldUsername, setCheckFieldUsername] = useState(false);
 
 const checkAvailability = debounce(async (field, value) => {
   console.log(form.formState.errors)
-  setCheckFieldEmail(false);
-  setCheckFieldUsername(false);
+  if(field === 'email') {
+    setCheckFieldEmail(false);
+  }
+  if(field === 'username') {
+    setCheckFieldUsername(false);
+  }
   if (!value) return
 
   if (value.length < 5 && field === 'username') {
