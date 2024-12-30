@@ -3,6 +3,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\inertia;
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LogoutControllerController;
+use App\Http\Controllers\Home\DashboardController;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -20,6 +22,18 @@ Route::get('/about', function () {
 Route::get('/register', function () {
     return Inertia::render('Register');
 });
+
+// Route untuk redirect ke Google
+Route::get('/auth/google/redirect', [RegisterController::class, 'redirectToGoogle']);
+
+// Route untuk callback dari Google
+Route::get('/auth/google/callback', [RegisterController::class, 'handleGoogleCallback']);
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth');
+
+Route::post('/login', [LoginController::class, 'login'])
+
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::post('/register',[RegisterController::class, 'store']);
 Route::post('/validuseremail',[RegisterController::class, 'validUserEmail']);
