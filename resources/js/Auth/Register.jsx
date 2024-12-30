@@ -106,7 +106,42 @@ class ErrorBoundary extends React.Component {
 
 export function SignUpWithGoogle() {
   const handleGoogleLogin = () => {
-    window.location.href = '/auth/google/redirect';
+    const width = 500;
+    const height = 500;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+
+    const uniqueUrl = `/auth/google/redirect?rand=${Date.now()}`;
+
+    const loginPopup = window.open(
+        uniqueUrl, // URL endpoint Laravel untuk login Google
+        'Google Login',
+        `width=${width},height=${height},top=${top},left=${left}`
+    );
+
+    // Monitor jika popup ditutup
+    setTimeout(() => {
+      const width = 600;
+      const height = 600;
+      const left = (window.innerWidth - width) / 2;
+      const top = (window.innerHeight - height) / 2;
+
+      const uniqueUrl = `/auth/google/redirect?rand=${Date.now()}`; // Tambahkan query string acak
+      console.log(Date.now)
+      const loginPopup = window.open(
+          uniqueUrl, // URL endpoint untuk login Google
+          'Google Login',
+          `width=${width},height=${height},top=${top},left=${left}`
+      );
+
+      const interval = setInterval(() => {
+          if (loginPopup.closed) {
+              clearInterval(interval);
+              window.location.href = '/dashboard' //  Reload halaman utama setelah popup ditutup
+            }
+        }, 500);
+    }, 1000); 
+    // window.location.href = '/auth/google/redirect';
   }
 
   return (

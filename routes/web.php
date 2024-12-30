@@ -3,7 +3,11 @@ use Illuminate\Support\Facades\Route;
 use Inertia\inertia;
 
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\LogoutControllerController;
+
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\LoginController;
+
+use App\Http\Controllers\Auth\DataUsersController;
 use App\Http\Controllers\Home\DashboardController;
 
 Route::get('/', function () {
@@ -31,9 +35,10 @@ Route::get('/auth/google/callback', [RegisterController::class, 'handleGoogleCal
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth');
 
-Route::post('/login', [LoginController::class, 'login'])
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LogoutController::class, 'logout']);
 
-Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+// Route::middleware(['auth'])->get('/dashboard', [DataUsersController::class, 'index']);
 
 Route::post('/register',[RegisterController::class, 'store']);
 Route::post('/validuseremail',[RegisterController::class, 'validUserEmail']);

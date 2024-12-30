@@ -67,7 +67,9 @@
         
 
         public function redirectToGoogle() {
-            return Socialite::driver('google')->redirect();
+            return Socialite::driver('google')
+            ->with(['prompt' => 'consent'])
+            ->redirect();
         }
 
         public function handleGoogleCallback(Request $request) {
@@ -113,7 +115,11 @@
                 // Login pengguna
                 Auth::login($user);
         
-                return redirect('/dashboard')->with('success', 'Berhasil login dengan Google!');
+                // return redirect('/dashboard')->with('success', 'Berhasil login dengan Google!');
+                return "<script>
+                        window.opener.location.reload(); // Reload parent window untuk memuat status login
+                        window.close(); // Tutup popup
+                        </script>";
             } catch (\Exception $e) {
                 \Log::error('Error during Google login:', [
                     'message' => $e->getMessage(),

@@ -21,15 +21,20 @@ const Login = () => {
     setErrors({});
 
     try {
+      console.log(formData)
       const response = await axios.post("/login", formData);
-      alert(response.data.message); // Tampilkan pesan sukses
+      console.log(response.data); // Tampilkan pesan sukses
       window.location.href = "/dashboard"; // Arahkan ke dashboard
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setErrors({ general: error.response.data.message });
-      } else {
-        console.error("Login error:", error);
-      }
+      if (error.response) {
+        // Cek apakah ada errors di data
+        const errorMessage = error.response.data.errors 
+            ? Object.values(error.response.data.errors).flat().join(", ")
+            : error.response.data.message;
+        console.error(errorMessage);
+    } else {
+        console.error("Terjadi Kesalahan Jaringan");
+    }
     } finally {
       setLoading(false);
     }

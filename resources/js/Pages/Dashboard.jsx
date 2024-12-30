@@ -4,9 +4,24 @@ import axios from 'axios';
 
 
 function LogoutButton() {
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (confirm('Apakah Anda yakin ingin logout?')) {
-            axios.post('/logout');
+            try {
+                const response = await axios.post('/logout');
+                console.log(response.data); // Tampilkan pesan sukses
+                window.location.href = "/login"; // Arahkan ke dashboard
+            } catch (error) {
+                if (error.response) {
+                    // Cek apakah ada errors di data
+                    const errorMessage = error.response.data.errors 
+                        ? Object.values(error.response.data.errors).flat().join(", ")
+                        : error.response.data.message;
+                    console.error(errorMessage);
+                } else {
+                    console.error("Terjadi Kesalahan Jaringan");
+                }
+            }
+            console.log('Logged out')
         }
     };
 
@@ -23,8 +38,8 @@ function Dashboard() {
 
     return (
         <div>
-            {/* <h1>Halo</h1> */}
-            {/* <LogoutButton /> */}
+            <h1>Halo</h1>
+            <LogoutButton />
             <h1>Selamat Datang, {auth.user?.first_name}!</h1>
             <p>Email: {auth.user?.email}</p>
             <p>Username: {auth.user?.username}</p>
