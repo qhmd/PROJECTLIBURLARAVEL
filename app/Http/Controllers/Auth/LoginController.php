@@ -20,13 +20,12 @@ class LoginController extends Controller
 
         // Cek apakah login berhasil
         if (Auth::attempt($credentials)) {
-            // Login sukses, redirect ke halaman yang dimaksud
-            return redirect()->intended('/dashboard');
+            // return redirect()->intended('/dashboard');
         }
 
         // Jika login gagal, kirimkan error kembali dengan pesan yang lebih jelas
         return back()->withErrors([
-            'email' => 'Invalid credentials, please try again.',
+            'message' => 'Periksa email dan password anda.',
         ]);
     }
 }

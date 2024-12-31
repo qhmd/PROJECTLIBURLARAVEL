@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { z } from "zod";
 import bigLogo from "../../../public/images/biglogo.png";
-import { Link, usePage } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import Spinner from "../../../public/components/Spinner.jsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -30,6 +29,58 @@ const formSchema = z
       }),
   });
 
+export function SignUpWithGoogle() {
+  const handleGoogleLogin = () => {
+    const width = 500;
+    const height = 500;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+
+    const uniqueUrl = `/auth/google/redirect?rand=${Date.now()}`;
+
+    const loginPopup = window.open(
+        uniqueUrl, // URL endpoint Laravel untuk login Google
+        'Google Login',
+        `width=${width},height=${height},top=${top},left=${left}`
+    );
+
+    // Monitor jika popup ditutup
+    setTimeout(() => {
+      const width = 600;
+      const height = 600;
+      const left = (window.innerWidth - width) / 2;
+      const top = (window.innerHeight - height) / 2;
+
+      const uniqueUrl = `/auth/google/redirect?rand=${Date.now()}`; // Tambahkan query string acak
+      console.log(Date.now)
+      const loginPopup = window.open(
+          uniqueUrl, // URL endpoint untuk login Google
+          'Google Login',
+          `width=${width},height=${height},top=${top},left=${left}`
+      );
+
+      const interval = setInterval(() => {
+          if (loginPopup.closed) {
+              clearInterval(interval);
+              window.location.href = '/dashboard' //  Reload halaman utama setelah popup ditutup
+            }
+        }, 500);
+    }, 1000); 
+    // window.location.href = '/auth/google/redirect';
+  }
+
+  return (
+    <button
+          onClick={handleGoogleLogin}
+          className=" my-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
+            class="h-[18px] w-[18px] "/>
+            Continue with Google
+    </button>
+  )
+}
+
 export function ProfileLogin() {
   const [processing, setProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null); // Untuk menyimpan pesan error
@@ -45,36 +96,45 @@ export function ProfileLogin() {
     },
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     setProcessing(true);
     setErrorMessage(null); // Reset pesan error sebelum mencoba login
-    try {
-      await axios.post("/login", data);
-      window.location.href = "/dashboard"; // Redirect ke dashboard
-    } catch (error) {
-      if (error.response) {
-        const errorMessage = error.response.data.errors
-          ? Object.values(error.response.data.errors).flat().join(", ")
-          : error.response.data.message;
-        setErrorMessage(errorMessage); // Tampilkan pesan error
-        console.error(errorMessage);
-      } else {
-        console.log(error)
-        setErrorMessage("Terjadi Kesalahan Jaringan");
-        console.error("Terjadi Kesalahan Jaringan");
+
+    // Gunakan Inertia.post untuk mengirim data login
+    router.post(
+      "/login",data,
+      {
+        onError: (errors) => {
+          // Jika ada error dari server, tangani di sini
+          const errorMessage = errors
+            ? Object.values(errors).flat().join(", ")
+            : "Terjadi Kesalahan Jaringan";
+          setErrorMessage(errorMessage);
+        },
+        onFinish: () => setProcessing(false), // Reset state processing
       }
-    } finally {
-      setProcessing(false);
-    }
+    );
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1 max-w-xs w-96">
         {errorMessage && (
-          <div className="bg-red-100 text-red-600 p-4 rounded-lg mb-4">
-            {errorMessage}
+          <div id="alert-2" class="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+          <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+          </svg>
+          <span class="sr-only">Info</span>
+          <div class="ms-3 text-sm font-medium">
+            A simple info alert with an <a href="#" class="font-semibold underline hover:no-underline">example link</a>. Give it a click if you like.
           </div>
+          <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700" data-dismiss-target="#alert-2" aria-label="Close">
+            <span class="sr-only">Close</span>
+            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+            </svg>
+          </button>
+        </div>
         )}
         <FormField
           control={form.control}
@@ -89,7 +149,6 @@ export function ProfileLogin() {
             </FormItem>
           )}
         />
-        <hr />
         <FormField
           control={form.control}
           name="password"
@@ -142,6 +201,7 @@ const Login = () => {
             Buat Akun
           </Link>
         </p>
+        <SignUpWithGoogle/>
         <div className="flex w-full items-center gap-2 py-2 text-sm text-slate-600">
           <div className="h-px w-full bg-slate-200"></div>
           OR

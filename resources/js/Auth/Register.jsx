@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { router } from '@inertiajs/react';  // Mengimpor Inertia
 import axios from "axios";
 import Spinner from "../../../public/components/Spinner.jsx";
 import MiniSpinner from "../../../public/components/MiniSpinner.jsx";
 import { Checkmark } from 'react-checkmark'
 
-import {Link} from "@inertiajs/react";
+import {Link, router} from "@inertiajs/react";
 import bigLogo from "../../../public/images/biglogo.png";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -194,23 +193,15 @@ const handleProsess = async (data) => {
 const onSubmit = async (data) => {
   console.log("Form data:", data);
   setProcessing(true);
-
-  try {
-    // Kirim data menggunakan axios
-    const response = await axios.post("/register", data);
-    console.log("Success:", response.data);
-  } catch (error) {
-      if (error.response) {
-        // Cek apakah ada errors di data
-        const errorMessage = error.response.data.errors 
-            ? Object.values(error.response.data.errors).flat().join(", ")
-            : error.response.data.message;
-        console.error(errorMessage);
-    } else {
-        console.error("Terjadi Kesalahan Jaringan");
-    }
-  } finally {
-    setProcessing(false); // Nonaktifkan indikator proses
+  router.post('/register', data), {
+      onError: (errors) => {
+        // Jika ada error dari server, tangani di sini
+        const errorMessage = errors
+          ? Object.values(errors).flat().join(", ")
+          : "Terjadi Kesalahan Jaringan";
+          console.log(errorMessage)
+      },
+      onFinish: () => setProcessing(false), // Reset state processing
   }
 };
 
