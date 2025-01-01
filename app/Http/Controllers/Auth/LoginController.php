@@ -20,7 +20,7 @@ class LoginController extends Controller
 
         // Cek apakah login berhasil
         if (Auth::attempt($credentials)) {
-            // return redirect()->intended('/dashboard');
+            return redirect()->intended('/dashboard');
         }
 
         // Jika login gagal, kirimkan error kembali dengan pesan yang lebih jelas

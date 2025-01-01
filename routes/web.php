@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
 
 use App\Http\Controllers\Auth\DataUsersController;
 use App\Http\Controllers\Home\DashboardController;
@@ -42,3 +43,5 @@ Route::post('/logout', [LogoutController::class, 'logout']);
 
 Route::post('/register',[RegisterController::class, 'store']);
 Route::post('/validuseremail',[RegisterController::class, 'validUserEmail']);
+
+Route::post('/reset-password',[PasswordResetController::class,'reset']);
