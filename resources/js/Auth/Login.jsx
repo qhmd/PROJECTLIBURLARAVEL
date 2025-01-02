@@ -140,8 +140,11 @@ export function ProfileLogin() {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem className="flex flex-col items-start">
-              <FormLabel>Password</FormLabel>
+            <FormItem className="flex flex-col">
+              <div className="flex justify-between items-center">
+                <FormLabel>Password</FormLabel>
+                <Link href="/forgot-password" className="font-sans text-blue-500">Lupa katasandi ?</Link>
+              </div>
               <FormControl>
                 <Input placeholder="Masukkan Password" type="password" {...field} />
               </FormControl>

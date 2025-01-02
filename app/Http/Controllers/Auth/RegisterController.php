@@ -9,7 +9,7 @@
     use Illuminate\Support\Facades\Validator;
     use Illuminate\Validation\Rules\Password;
     use Illuminate\Validation\validatePasswordConfirm;
-
+    use Illuminate\Support\Facades\Redirect;
     use Laravel\Socialite\Facades\Socialite;
 
 
@@ -52,8 +52,7 @@
             }
 
             $exists = \App\Models\User::where($field, $value)->exists();
-
-            return response()->json(['available' => !$exists]);
+            return response()->json(['message' => $exists], 400);
         }
 
         protected function generateUniqueUsername($baseName) {

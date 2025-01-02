@@ -28,6 +28,13 @@ Route::get('/register', function () {
     return Inertia::render('Register');
 });
 
+
+Route::get('/forgot-password', function () {
+    return Inertia::render('ForgotPassword');
+});
+
+
+
 // Route untuk redirect ke Google
 Route::get('/auth/google/redirect', [RegisterController::class, 'redirectToGoogle']);
 
