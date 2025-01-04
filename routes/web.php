@@ -33,7 +33,7 @@ Route::get('/forgot-password', function () {
     return Inertia::render('ForgotPassword');
 });
 
-
+Route::post('/forgot-password',[PasswordResetController::class, 'sendResetLink']);
 
 // Route untuk redirect ke Google
 Route::get('/auth/google/redirect', [RegisterController::class, 'redirectToGoogle']);
@@ -50,5 +50,8 @@ Route::post('/logout', [LogoutController::class, 'logout']);
 
 Route::post('/register',[RegisterController::class, 'store']);
 Route::post('/validuseremail',[RegisterController::class, 'validUserEmail']);
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('web');;
 
-Route::post('/reset-password',[PasswordResetController::class,'reset']);
+Route::get('/reset-password/{token}', function ($token) {
+    return Inertia::render('ResetPassword', ['token' => $token]);
+})->name('password.reset');

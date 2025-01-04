@@ -51,7 +51,7 @@ export function SendEmail() {
 
     // Gunakan Inertia.post untuk mengirim data login
     router.post(
-      "/login",data,
+      "/forgot-password",data,
       {
         onError: (errors) => {
           // Jika ada error dari server, tangani di sini
@@ -60,54 +60,12 @@ export function SendEmail() {
             : "Terjadi Kesalahan Jaringan";
           setErrorMessage(errorMessage);
         },
-        onFinish: () => setProcessing(false), // Reset state processing
+        onFinish: () => {
+          setProcessing(false)
+        }, // Reset state processing
       }
     );
   };
-
-  const [checkFieldEmail, setCheckFieldEmail] = useState(false);
-  const [loadingField, setLoadingField] = useState(null); // Menyimpan field yang sedang divalidasi
-  
- 
-  const checkAvailability = debounce(async (field, value) => {
-    if(field === 'email') {
-      setCheckFieldEmail(false);
-    }
-
-    if (!value) return
-    
-    if (field === 'email') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
-        form.setError(field, {
-          type: 'manual',
-          message: 'Format email tidak valid.',
-        });
-        return;
-      }
-    }
-
-    setLoadingField(field)
-        try {
-          const response = await axios.post('/validuseremail', { field, value });
-          if (response.data.available) {
-            form.setError(field, {
-              type: 'manual',
-              message: "Email tidak ditemukan.",
-            });
-              setCheckFieldEmail(true);
-            } else {
-            form.clearErrors(field);
-          }
-          setCheckFieldEmail(true);
-        } catch (error) {
-          console.error("Error validating field:", error);
-        } finally {
-          setLoadingField(null); // Hapus field dari state loading
-        }
-    
-  }, 300);
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1 max-w-xs w-96">
@@ -122,23 +80,7 @@ export function SendEmail() {
               <FormLabel>E-mail</FormLabel>
               <FormControl>
                 <div className="relative w-full flex items-center justify-center">
-                  <Input
-                    className={`${checkFieldEmail ? 'outline outline-green-500 outline-2' : ''}`}
-                    placeholder="Masukkan Email"
-                    {...field}
-                    onChange={(e) => {
-                      field.onChange(e); // Update form state
-                      checkAvailability("email", e.target.value); // Panggil validasi real-time
-                    }}
-                  />
-                  <div className="absolute right-0 px-2">
-                    {loadingField === "email" && (
-                        <MiniSpinner className="animate-spin" />
-                    )}
-                    {checkFieldEmail === true && (
-                      <Checkmark size='small'/>
-                    )}
-                  </div>
+                  <Input placeholder='Masukkan E-mail' {...field}/>
                 </div>
               </FormControl>
               <FormMessage />
