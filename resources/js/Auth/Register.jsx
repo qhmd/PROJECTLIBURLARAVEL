@@ -443,7 +443,8 @@ function Register() {
       <div className="p-8 mx-4">
         <img src={bigLogo} draggable="false" onDrag={false} className="w-80 mx-auto" alt="" />
         <h1 className="font-bold text-xl my-4">
-          Jual Beli Anda Lebih Mudah di AmbaShop
+          Jual Beli Anda Lebih Mudah di AmbaShop <br />
+          Suki Di Larang Join ☝️🤓
         </h1>
         <p className="text-gray-500">
           Gabung dan rasakan kemudahaan bertransaksi di AmbaShop

@@ -6,17 +6,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class PasswordResetController extends Controller {
     public function sendResetLink(Request $request)
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
-        $status = Password::sendResetLink($request->only('email'));
+        $otp = rand(10000, 99999); // Generate OTP
+        Cache::put('otp_' . $request->email, $otp, 300); // Simpan OTP di cache selama 5 menit
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('status', __($status))
-            : back()->withErrors(['email' => __($status)]);
+        // Kirim OTP (contoh: menggunakan Mail)
+        Mail::send('Auth.forgot-password', ['otp' => $otp], function ($message) use ($request) {
+            $message->to($request->email)
+                    ->subject('Kode OTP untuk Verifikasi Akun Anda');
+        });
+
+        return redirect()->intended('/otp')->with('status', 'Kode OTP telah dikirim ke email Anda.');
+
     }
 
 
