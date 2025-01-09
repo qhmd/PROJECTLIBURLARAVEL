@@ -5,7 +5,7 @@ import { Link, router } from "@inertiajs/react";
 import Spinner from "../../../public/components/Spinner.jsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import AlertError from "../../../public/components/AllertError";
+import AlertError from "../../../public/components/AlertError.jsx";
 
 import {
   Form,
@@ -76,7 +76,7 @@ export function SignUpWithGoogle() {
           className=" my-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
-            class="h-[18px] w-[18px] "/>
+            className="h-[18px] w-[18px] "/>
             Continue with Google
     </button>
   )

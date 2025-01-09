@@ -15,79 +15,60 @@ class PasswordResetController extends Controller {
     public function sendResetLink(Request $request)
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
-        $otp = rand(10000, 99999); // Generate OTP
-        Cache::put('otp_' . $request->email, $otp, 300); // Simpan OTP di cache selama 5 menit
+        $otp = rand(100000, 999999); // Generate OTP
+        Cache::put('otp_' . $request->email,['otp' => $otp, 'used' => false], now()->addMinutes(30)); // Simpan OTP di cache selama 5 menit
 
+        session(['email' => $request->email]);
         // Kirim OTP (contoh: menggunakan Mail)
         Mail::send('Auth.forgot-password', ['otp' => $otp], function ($message) use ($request) {
             $message->to($request->email)
                     ->subject('Kode OTP untuk Verifikasi Akun Anda');
         });
 
-        return redirect()->intended('/otp')->with('status', 'Kode OTP telah dikirim ke email Anda.');
-
+        return redirect()->intended('/input-otp')->with('status', 'Kode OTP telah dikirim ke email Anda.');
     }
 
-
-    public function reset(Request $request)
+    
+    public function verifyOtp(Request $request)
     {
-        // Log request data (tanpa password untuk keamanan)
-        Log::info('Reset password request received', [
-            'email' => $request->email,
-            'token' => $request->token,
-        ]);
-    
-        // Validasi input
+        // Validasi input OTP saja
         $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'otp' => 'required|numeric'
         ]);
-    
-        // Log bahwa validasi berhasil
-        Log::info('Validation passed for reset password request', [
-            'email' => $request->email,
-        ]);
-    
-        // Proses reset password
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => bcrypt($password),
-                ])->save();
-    
-                // Log user update
-                Log::info('User password updated successfully', ['user_id' => $user->id]);
-            }
-        );
-    
-        // Log hasil reset password
-        if ($status === Password::PASSWORD_RESET) {
-            Log::info('Password reset successful', ['email' => $request->email]);
-        } else {
-            Log::error('Password reset failed', [
-                'email' => $request->email,
-                'status' => $status,
-            ]);
-        }
-        Log::info('Reset password request received', [
-            'token' => $request->header('X-CSRF-TOKEN'),
-        ]);
-    
-        // Respons ke pengguna
-        return $status === Password::PASSWORD_RESET
-            ? redirect('/login')->with('status', __($status))
-            : back()->withErrors(['email' => [__($status)]]);
 
-        if ($status === Password::INVALID_TOKEN) {
-            Log::error('Password reset failed due to invalid or expired token', [
-                'email' => $request->email,
-                'status' => $status,
-            ]);
-            return redirect('/login')->withErrors(['email' => __('This password reset link is invalid or expired.')]);
+        // Ambil email dari sesi pengguna yang sedang login
+        $email = session('email');
+
+        // Log email pengguna
+        Log::info('Verifikasi OTP untuk email: ' . $email);
+    
+        // Ambil OTP yang disimpan di cache
+        $storedOtp = Cache::get('otp_' . $email);
+    
+        // Log OTP yang disimpan dan OTP yang diinputkan
+        Log::info('OTP yang disimpan: ' . ($storedOtp['otp'] ?? 'Tidak ditemukan'));
+        Log::info('OTP yang diinputkan: ' . $request->otp);
+
+        if ($storedOtp && $storedOtp['used']) {
+            Log::warning('OTP sudah digunakan untuk email: ' . $email);
+            return back()->withErrors(['message' => 'OTP sudah digunakan.']);
         }
-            
+    
+        // Periksa kesesuaian OTP
+        if ($storedOtp && $storedOtp['otp'] == $request->otp) {
+            Cache::put('otp_' . $email, ['otp' => $storedOtp['otp'], 'used' => true], now()->addMinutes(5));
+            Log::info('OTP valid untuk email: ' . $email);
+    
+            // Redirect dengan pesan sukses menggunakan Inertia
+            return redirect()->intended('login')->with('success', 'OTP valid.');
+        }
+    
+        // Log jika OTP tidak valid
+        Log::warning('OTP tidak valid untuk email: ' . $email);
+    
+        // Redirect dengan pesan error menggunakan Inertia
+        return back()->withErrors(['message' => 'OTP tidak valid.']);
     }
+    
     
 }

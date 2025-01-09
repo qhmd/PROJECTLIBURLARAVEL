@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { z } from "zod";
 import bigLogo from "../../../public/images/biglogo.png";
-import { Link, router } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import Spinner from "../../../public/components/Spinner.jsx";
-import MiniSpinner from "../../../public/components/MiniSpinner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import AlertError from "../../../public/components/AllertError";
-import debounce from 'lodash.debounce';
-import axios from "axios";
-import { Checkmark } from 'react-checkmark'
+import AlertError from "../../../public/components/AlertError";
+import { toast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
+
 
 
 import {
@@ -23,18 +22,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+
 // Skema validasi menggunakan Zod
-const formSchema = z
+function SendEmail() {
+  const [processing, setProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null); // Untuk menyimpan pesan error
+  // Inisialisasi React Hook Form dengan resolver Zod
+  const formSchema = z
   .object({
     email: z.string().email({ message: "Format email tidak valid." }),
   });
-
-
-export function SendEmail() {
-  const [processing, setProcessing] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null); // Untuk menyimpan pesan error
-
-  // Inisialisasi React Hook Form dengan resolver Zod
   const form = useForm({
     resolver: zodResolver(formSchema),
     mode: "onChange",
@@ -44,11 +41,10 @@ export function SendEmail() {
     },
   });
 
-
   const onSubmit = (data) => {
     setProcessing(true);
     setErrorMessage(null); // Reset pesan error sebelum mencoba login
-
+    
     // Gunakan Inertia.post untuk mengirim data login
     router.post(
       "/forgot-password",data,
@@ -103,9 +99,6 @@ export function SendEmail() {
   );
 }
 
-
-
-
 const ForgotPassword = () => {
   return (
     <div className="flex justify-center items-center min-h-screen text-center">
@@ -117,7 +110,7 @@ const ForgotPassword = () => {
         </h1>
         <p className="text-gray-500">
           Gabung dan rasakan kemudahaan bertransaksi di AmbaShop
-        </p>
+        </p>  
       </div>
 
       {/* Bagian Form */}
