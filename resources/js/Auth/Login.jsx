@@ -184,6 +184,7 @@ const Login = () => {
 
       {/* Bagian Form */}
       <div className="border px-8 py-4 mx-4 my-4">
+        
         <h1 className="font-bold text-2xl">Masuk Sekarang</h1>
         <p>
           Belum punya aku Ambashop?{" "}
