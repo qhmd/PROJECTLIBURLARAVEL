@@ -38,7 +38,7 @@ Route::get('/input-otp' ,function () {
 });
 
 Route::get('/reset-password', function () {
-    return Inertia::render('ResetPassword');
+    return Inertia::render('ChangePassword');
 });
 
 Route::post('/forgot-password',[PasswordResetController::class, 'sendResetLink']);
@@ -53,7 +53,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('aut
 
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LogoutController::class, 'logout']);
-
+Route::post('/reset-password', [PasswordResetController::class, 'updateUserPass']);
 // Route::middleware(['auth'])->get('/dashboard', [DataUsersController::class, 'index']);
 
 Route::post('/register',[RegisterController::class, 'store']);

@@ -21,19 +21,27 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPSeparator,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 
+import InputOTPForm from './ConfirmOtp.jsx'
+import ChangePassword from './ChangePassword.jsx'
 
 // Skema validasi menggunakan Zod
-function SendEmail() {
+function SendEmail( {onSuccess} ) {
   const [processing, setProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null); // Untuk menyimpan pesan error
   // Inisialisasi React Hook Form dengan resolver Zod
-  const formSchema = z
+  const formSchemaSendMail = z
   .object({
     email: z.string().email({ message: "Format email tidak valid." }),
   });
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const formSendMail = useForm({
+    resolver: zodResolver(formSchemaSendMail),
     mode: "onChange",
     criteriaMode: "all",
     defaultValues: {
@@ -49,6 +57,9 @@ function SendEmail() {
     router.post(
       "/forgot-password",data,
       {
+        onSuccess: () => {
+          onSuccess()
+        },
         onError: (errors) => {
           // Jika ada error dari server, tangani di sini
           const errorMessage = errors
@@ -63,13 +74,13 @@ function SendEmail() {
     );
   };
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1 max-w-xs w-96">
+    <Form {...formSendMail}>
+      <form onSubmit={formSendMail.handleSubmit(onSubmit)} className="space-y-1 max-w-xs w-96">
         {errorMessage && (
           <AlertError message={errorMessage}/>
         )}
         <FormField
-          control={form.control}
+          control={formSendMail.control}
           name="email"
           render={({ field }) => (
             <FormItem className="flex flex-col items-start">
@@ -88,8 +99,8 @@ function SendEmail() {
             type="submit"
             className={`flex rounded-2xl bg-purple-800 text-white items-center justify-center w-full h-14 font-bold !mt-4 ${
               processing ? "cursor-not-allowed" : ""
-            } ${!form.formState.isValid ? "opacity-50" : ""}`}
-            disabled={!form.formState.isValid || processing}
+            } ${!formSendMail.formState.isValid ? "opacity-50" : ""}`}
+            disabled={!formSendMail.formState.isValid || processing}
           >
             {processing ? <Spinner className="animate-spin" /> : "Kirim"}
           </button>
@@ -99,7 +110,10 @@ function SendEmail() {
   );
 }
 
+
 const ForgotPassword = () => {
+const [forPage, setForPage] = useState(1);
+
   return (
     <div className="flex justify-center items-center min-h-screen text-center">
       {/* Bagian Kiri */}
@@ -114,10 +128,25 @@ const ForgotPassword = () => {
       </div>
 
       {/* Bagian Form */}
+      { forPage == 1 && (
       <div className="border px-8 py-4 mx-4 my-4">
         <h1 className="font-bold mb-2">Masukkan E-mail anda</h1>
-        <SendEmail/>
+        <SendEmail onSuccess={() => setForPage(2)}/>
       </div>
+      )}
+      { forPage == 2 && (
+      <div className="border px-8 py-4 mx-4 my-4">
+        <h1 className="font-bold mb-2">Masukkan Otp Anda</h1>
+        <p>Silahkan cek pesan di E-mail anda</p>
+        <InputOTPForm onSuccess={() => setForPage(3)}/>
+      </div>
+      )}
+      { forPage == 3 && (
+      <div className="border px-8 py-4 mx-4 my-4">
+        <h1 className="font-bold mb-2">Ganti Password Anda</h1>
+        <ChangePassword/>
+      </div>
+      )}
     </div>
   );
 };

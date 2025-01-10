@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\validatePasswordConfirm;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
+
 
 class PasswordResetController extends Controller {
     public function sendResetLink(Request $request)
@@ -25,7 +28,7 @@ class PasswordResetController extends Controller {
                     ->subject('Kode OTP untuk Verifikasi Akun Anda');
         });
 
-        return redirect()->intended('/input-otp')->with('status', 'Kode OTP telah dikirim ke email Anda.');
+        return back()->with('status', 'Kode OTP telah dikirim ke email Anda.');
     }
 
     
@@ -60,7 +63,7 @@ class PasswordResetController extends Controller {
             Log::info('OTP valid untuk email: ' . $email);
     
             // Redirect dengan pesan sukses menggunakan Inertia
-            return redirect()->intended('login')->with('success', 'OTP valid.');
+            return back()->with('success', 'OTP valid.');
         }
     
         // Log jika OTP tidak valid
@@ -69,6 +72,29 @@ class PasswordResetController extends Controller {
         // Redirect dengan pesan error menggunakan Inertia
         return back()->withErrors(['message' => 'OTP tidak valid.']);
     }
-    
+
+
+
+    public function updateUserPass(Request $request) {
+        $request->validate([
+            'password' => ['required', 'confirmed', Password::defaults()],
+            'password_confirmation' => ['required'],
+        ]);
+        
+        // Ambil user yang sedang login
+        $email = session('email');
+        $user = User::where('email', $email)->first();
+        
+        
+        if ($user) {
+            // Update password dan hash password baru
+            $user->password = Hash::make($request->password);
+            $user->save();
+            
+            return redirect()->intended('/login');
+        } else {
+            return back()->withErrors(['message' => 'Ubah kata sandi gagal.']);
+        }
+    }
     
 }
