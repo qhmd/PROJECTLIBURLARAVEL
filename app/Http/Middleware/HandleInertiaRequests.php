@@ -13,6 +13,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'success' => session('success'),
+            'sendEmail' => session('sendEmail'),
+            'error' => session('error'),
         ]);
     }
     /**

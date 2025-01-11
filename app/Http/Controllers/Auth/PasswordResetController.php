@@ -27,7 +27,8 @@ class PasswordResetController extends Controller {
             $message->to($request->email)
                     ->subject('Kode OTP untuk Verifikasi Akun Anda');
         });
-
+        session()->flash('success', 'Kode OTP berhasil dikirim ke email anda');
+        session()->flash('sendEmail', $request->email);
         return back()->with('status', 'Kode OTP telah dikirim ke email Anda.');
     }
 
@@ -41,7 +42,6 @@ class PasswordResetController extends Controller {
 
         // Ambil email dari sesi pengguna yang sedang login
         $email = session('email');
-
         // Log email pengguna
         Log::info('Verifikasi OTP untuk email: ' . $email);
     

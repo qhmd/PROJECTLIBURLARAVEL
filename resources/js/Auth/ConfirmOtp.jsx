@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { z } from "zod";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import Spinner from "../../../public/components/Spinner.jsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import AlertError from "../../../public/components/AlertError";
+import {AlertDestructive} from "../../../public/components/AlertDestructive.jsx";
+import { AlertSuccess } from "../../../public/components/AlertSuccess.jsx";
 import { toast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 
@@ -28,6 +29,12 @@ import {
 
 
 export default function InputOTPForm({onSuccess}) {
+  const {props} = usePage()
+  const {success, sendEmail} = props;
+  console.log(props)
+  console.log(success)
+  console.log(sendEmail)
+  const [processing, setProcessing] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null); // Untuk menyimpan pesan error
     const FormSchema = z.object({
       otp: z.string().min(6, { 
@@ -40,7 +47,32 @@ export default function InputOTPForm({onSuccess}) {
         otp: "",
       },
     })
-  
+    
+      const sendAgainOTP = () => {
+        setProcessing(true);
+        setErrorMessage(null); // Reset pesan error sebelum mencoba login
+        
+        // Gunakan Inertia.post untuk mengirim data login
+        router.post(
+          "/forgot-password",sendEmail,
+          {
+            onSuccess: () => {
+              onSuccess()
+            },
+            onError: (errors) => {
+              // Jika ada error dari server, tangani di sini
+              const errorMessage = errors
+                ? Object.values(errors).flat().join(", ")
+                : "Terjadi Kesalahan Jaringan";
+              setErrorMessage(errorMessage);
+            },
+            onFinish: () => {
+              setProcessing(false)
+            }, // Reset state processing
+          }
+        );
+      };
+
     function onSubmit(data) {
       router.post("/input-otp", data, {
         onSuccess: () => {
@@ -66,9 +98,12 @@ export default function InputOTPForm({onSuccess}) {
   
     return (
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex flex-col items-center">
-        {errorMessage && (
-            <AlertError message={errorMessage}/>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1 flex flex-col items-center">
+          { success && (
+            <AlertSuccess message={success}/>
+          )}
+          {errorMessage && (
+            <AlertDestructive message={errorMessage}/>
           )}
           <FormField
             control={form.control}
@@ -92,6 +127,7 @@ export default function InputOTPForm({onSuccess}) {
                 <FormDescription>
                   Masukkan kode otp anda yang kami kirim melalui E-mail.
                 </FormDescription>
+                <p>Tidak menerima kode ? <button type="button" onClick={sendAgainOTP} className="text-blue-500">Kirim Ulang</button></p>
                 <FormMessage />
               </FormItem>
             )}

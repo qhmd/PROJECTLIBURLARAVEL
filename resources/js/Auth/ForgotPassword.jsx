@@ -8,7 +8,9 @@ import { useForm } from "react-hook-form";
 import AlertError from "../../../public/components/AlertError";
 import { toast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-
+import { Terminal } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import {AlertDestructive} from "../../../public/components/AlertDestructive";
 
 
 import {
@@ -73,11 +75,12 @@ function SendEmail( {onSuccess} ) {
       }
     );
   };
+  
   return (
     <Form {...formSendMail}>
       <form onSubmit={formSendMail.handleSubmit(onSubmit)} className="space-y-1 max-w-xs w-96">
         {errorMessage && (
-          <AlertError message={errorMessage}/>
+          <AlertDestructive message={errorMessage}/>
         )}
         <FormField
           control={formSendMail.control}
