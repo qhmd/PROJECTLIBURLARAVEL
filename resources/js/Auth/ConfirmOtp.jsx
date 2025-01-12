@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { router, usePage } from "@inertiajs/react";
 import Spinner from "../../../public/components/Spinner.jsx";
@@ -31,12 +31,17 @@ import {
 export default function InputOTPForm({onSuccess}) {
   const {props} = usePage()
   const {success, sendEmail} = props;
+  const validEmail = {
+    "email" : sendEmail
+  }
   console.log(props)
   console.log(success)
-  console.log(sendEmail)
+  console.log(validEmail)
+
   const [processing, setProcessing] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(null); // Untuk menyimpan pesan error
-    const FormSchema = z.object({
+  const [errorMessage, setErrorMessage] = useState(null); // Untuk menyimpan pesan error
+  const [succesSend, setSuccesSend] = useState(null); // Untuk menyimpan pesan error
+  const FormSchema = z.object({
       otp: z.string().min(6, { 
         message: "Your one-time password must be 6 characters.",
       }),
@@ -47,17 +52,34 @@ export default function InputOTPForm({onSuccess}) {
         otp: "",
       },
     })
+
+    const [timeLeft, setTimeLeft] = useState(30); // Set initial time to 30 seconds
+    const [isTimeUp, setIsTimeUp] = useState(false); // Track if time is up
+
+    useEffect(() => {
+      if (timeLeft > 0) {
+        const interval = setInterval(() => {
+          setTimeLeft((prevTime) => prevTime - 1); // Decrease time by 1 second
+        }, 1000);
+
+        return () => clearInterval(interval); // Cleanup interval on unmount
+      } else {
+        setIsTimeUp(true); // Time is up
+      }
+    }, [timeLeft]);
     
       const sendAgainOTP = () => {
         setProcessing(true);
+        setSuccesSend(null); 
         setErrorMessage(null); // Reset pesan error sebelum mencoba login
         
         // Gunakan Inertia.post untuk mengirim data login
         router.post(
-          "/forgot-password",sendEmail,
+          "/forgot-password",validEmail,
           {
             onSuccess: () => {
-              onSuccess()
+              success(null);
+              setSuccesSend("Kode OTP berhasil dikirim ulang.")
             },
             onError: (errors) => {
               // Jika ada error dari server, tangani di sini
@@ -67,6 +89,8 @@ export default function InputOTPForm({onSuccess}) {
               setErrorMessage(errorMessage);
             },
             onFinish: () => {
+              setTimeLeft(30);
+              setIsTimeUp(false); // Time is up
               setProcessing(false)
             }, // Reset state processing
           }
@@ -74,6 +98,8 @@ export default function InputOTPForm({onSuccess}) {
       };
 
     function onSubmit(data) {
+      setSuccesSend(null); 
+      setErrorMessage(null); // Reset pesan error sebelum mencoba login
       router.post("/input-otp", data, {
         onSuccess: () => {
           onSuccess()
@@ -86,21 +112,18 @@ export default function InputOTPForm({onSuccess}) {
         },
         onFinish : () => {console.log(data)}
       })
-      toast({
-        title: "You submitted the following values:",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
-      })
     }
+
+
   
     return (
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1 flex flex-col items-center">
-          { success && (
+          { success && !succesSend && (
             <AlertSuccess message={success}/>
+          )}
+          { succesSend && (
+            <AlertSuccess message={succesSend}/>
           )}
           {errorMessage && (
             <AlertDestructive message={errorMessage}/>
@@ -127,7 +150,13 @@ export default function InputOTPForm({onSuccess}) {
                 <FormDescription>
                   Masukkan kode otp anda yang kami kirim melalui E-mail.
                 </FormDescription>
-                <p>Tidak menerima kode ? <button type="button" onClick={sendAgainOTP} className="text-blue-500">Kirim Ulang</button></p>
+                {
+                  !isTimeUp? (
+                    <p className="text-gray-800">Kirim ulang OTP dalam {timeLeft} detik.</p>
+                  ) : (
+                    <p className="text-gray-800">Tidak menerima kode ? <button type="button" onClick={sendAgainOTP} className="text-blue-500">Kirim Ulang</button></p>
+                  )
+                }
                 <FormMessage />
               </FormItem>
             )}

@@ -28,8 +28,8 @@ class PasswordResetController extends Controller {
                     ->subject('Kode OTP untuk Verifikasi Akun Anda');
         });
         session()->flash('success', 'Kode OTP berhasil dikirim ke email anda');
-        session()->flash('sendEmail', $request->email);
-        return back()->with('status', 'Kode OTP telah dikirim ke email Anda.');
+        session()->flash('sendEmail', $request->email);    
+        return back();
     }
 
     
@@ -40,7 +40,7 @@ class PasswordResetController extends Controller {
             'otp' => 'required|numeric'
         ]);
 
-        // Ambil email dari sesi pengguna yang sedang login
+        // Ambil email dari sesi pengguna yang sedang login]
         $email = session('email');
         // Log email pengguna
         Log::info('Verifikasi OTP untuk email: ' . $email);
@@ -61,15 +61,12 @@ class PasswordResetController extends Controller {
         if ($storedOtp && $storedOtp['otp'] == $request->otp) {
             Cache::put('otp_' . $email, ['otp' => $storedOtp['otp'], 'used' => true], now()->addMinutes(5));
             Log::info('OTP valid untuk email: ' . $email);
-    
-            // Redirect dengan pesan sukses menggunakan Inertia
             return back()->with('success', 'OTP valid.');
         }
     
-        // Log jika OTP tidak valid
         Log::warning('OTP tidak valid untuk email: ' . $email);
-    
-        // Redirect dengan pesan error menggunakan Inertia
+        session()->flash('sendEmail', $email);    
+
         return back()->withErrors(['message' => 'OTP tidak valid.']);
     }
 
