@@ -6,6 +6,8 @@ import Spinner from "../../../public/components/Spinner.jsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import AlertError from "../../../public/components/AlertError.jsx";
+import {AlertDestructive} from "../../../public/components/AlertDestructive.jsx";
+
 
 import {
   Form,
@@ -121,7 +123,7 @@ export function ProfileLogin() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1 max-w-xs w-96">
         {errorMessage && (
-          <AlertError message={errorMessage}/>
+          <AlertDestructive message={errorMessage}/>
         )}
         <FormField
           control={form.control}

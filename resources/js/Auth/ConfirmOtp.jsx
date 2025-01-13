@@ -78,7 +78,6 @@ export default function InputOTPForm({onSuccess}) {
           "/forgot-password",validEmail,
           {
             onSuccess: () => {
-              success(null);
               setSuccesSend("Kode OTP berhasil dikirim ulang.")
             },
             onError: (errors) => {
