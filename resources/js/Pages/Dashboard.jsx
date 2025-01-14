@@ -1,6 +1,8 @@
 import React from 'react';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
+import Header from './Header';
+
 
 
 function LogoutButton() {
@@ -38,6 +40,8 @@ function Dashboard() {
 
     return (
         <div>
+
+            <Header auth={auth}/>   
             <h1>Halo</h1>
             <LogoutButton />
             <h1>Selamat Datang, {auth.user?.first_name}!</h1>

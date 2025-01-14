@@ -49,7 +49,7 @@ Route::get('/auth/google/redirect', [RegisterController::class, 'redirectToGoogl
 // Route untuk callback dari Google
 Route::get('/auth/google/callback', [RegisterController::class, 'handleGoogleCallback']);
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth');
+Route::get('/dashboard', [DashboardController::class, 'index']);
 
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LogoutController::class, 'logout']);
