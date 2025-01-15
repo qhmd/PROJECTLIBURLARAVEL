@@ -3,6 +3,14 @@ import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import Header from './Header';
 
+import banner1 from '../../../public/images/imgbanner1.webp'
+import banner2 from '../../../public/images/imgbanner2.webp'
+import ImageSlider from './ImageSlider';
+
+ 
+
+
+
 
 
 function LogoutButton() {
@@ -41,12 +49,19 @@ function Dashboard() {
     return (
         <div>
 
-            <Header auth={auth}/>   
+            <Header auth={auth}/>
+            <div className="imgBanner flex justify-center mt-4 ">
+                {/* <img src={banner1} draggable="false" className="w-auto h-14 pl-4" alt="Logo" /> */}
+                <img src={banner2} draggable="false" className="w-auto h-70 rounded rounded-xl" alt="Logo" />
+            </div>
             <h1>Halo</h1>
             <LogoutButton />
             <h1>Selamat Datang, {auth.user?.first_name}!</h1>
             <p>Email: {auth.user?.email}</p>
             <p>Username: {auth.user?.username}</p>
+            <div className='flex justify-center'>
+                <ImageSlider />
+            </div>
         </div>
     );
 }

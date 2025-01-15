@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+
+
+
 import logo from '../../../public/images/logo.png'
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
@@ -28,7 +31,7 @@ function Header({auth}) {
 
     return (
         <div>
-            <div className='flex items-center w-full bg-white border border-black-500 relative'>
+            <div className='flex items-center h-20 w-full bg-white border border-black-500 relative'>
                 <img src={logo} draggable="false" className="w-auto h-14 pl-4" alt="Logo" />
                 <Command className='ml-24 max-w-2xl border border-black-500 rounded rounded-xl'>
                     <CommandInput
@@ -82,6 +85,7 @@ function Header({auth}) {
                         </div>
                     }
                 </div>
+
             </div>
         </div>
     )
