@@ -20,18 +20,18 @@ import banner1 from '../../../public/images/imgbanner1.webp'
             delay: 5000,
           }),
         ]}>
-        <CarouselContent className='-ml-96 -mr-96 -pl-28'>
-          <CarouselItem className='flex justify-center -ml-20 -mr-18'>
-            <img src={banner1} className="w-auto h-75 rounded rounded-xl" alt="Image 3" />
+        <CarouselContent className=''>
+          <CarouselItem className='flex justify-center '>
+            <img src={banner1} className="w-auto h-70 rounded rounded-xl" alt="Image 3" />
           </CarouselItem >
-          <CarouselItem className='flex justify-center -ml-20 -mr-18'>
-            <img src={banner1} className="w-auto h-75 rounded rounded-xl" alt="Image 3" />
+          <CarouselItem className='flex justify-center '>
+            <img src={banner1} className="w-auto h-70 rounded rounded-xl" alt="Image 3" />
           </CarouselItem >
-          <CarouselItem className='flex justify-center -ml-20 -mr-18'>
-            <img src={banner1} className="w-auto h-75 rounded rounded-xl" alt="Image 3" />
+          <CarouselItem className='flex justify-center '>
+            <img src={banner1} className="w-auto h-70 rounded rounded-xl" alt="Image 3" />
           </CarouselItem >
-          <CarouselItem className='flex justify-center -ml-20 -mr-18'>
-            <img src={banner1} className="w-auto h-75 rounded rounded-xl" alt="Image 3" />
+          <CarouselItem className='flex justify-center '>
+            <img src={banner1} className="w-auto h-70 rounded rounded-xl" alt="Image 3" />
           </CarouselItem >
         </CarouselContent>
         <CarouselPrevious/>

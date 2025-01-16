@@ -50,16 +50,12 @@ function Dashboard() {
         <div>
 
             <Header auth={auth}/>
-            <div className="imgBanner flex justify-center mt-4 ">
-                {/* <img src={banner1} draggable="false" className="w-auto h-14 pl-4" alt="Logo" /> */}
-                <img src={banner2} draggable="false" className="w-auto h-70 rounded rounded-xl" alt="Logo" />
-            </div>
-            <h1>Halo</h1>
+            {/* <h1>Halo</h1>
             <LogoutButton />
             <h1>Selamat Datang, {auth.user?.first_name}!</h1>
             <p>Email: {auth.user?.email}</p>
-            <p>Username: {auth.user?.username}</p>
-            <div className='flex justify-center'>
+            <p>Username: {auth.user?.username}</p> */}
+            <div className='flex justify-center mt-4'>
                 <ImageSlider />
             </div>
         </div>
