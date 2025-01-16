@@ -33,14 +33,11 @@ function Header({auth}) {
         <div>
             <div className='flex items-center h-20 w-full bg-white border border-black-500 relative'>
                 <img src={logo} draggable="false" className="w-auto h-14 pl-4" alt="Logo" />
-                <Command className='ml-24 max-w-2xl border border-black-500 rounded rounded-xl'>
+                <Command className='flex justify-center max-w-2xl ml-24 pl-4 border-black-500 rounded rounded-xl'>
                     <CommandInput
                         placeholder="Type a command or search..."
-                        // value={searchTerm}
-                        // onChange={handleSearchChange}
                     />
-                    {searchTerm && (
-                        <CommandList className="absolute mt-12 border border-black-500 min-w-[675px]">
+                        {/* <CommandList className="absolute mt-24 border border-black-500 min-w-[675px]">
                             <CommandEmpty>No results found.</CommandEmpty>
                             <CommandGroup heading="Silahkan melakukan pencarian barang yang anda inginkan">
                                 <CommandItem>Calendar</CommandItem>
@@ -50,8 +47,7 @@ function Header({auth}) {
                                 <CommandItem>Billing</CommandItem>
                                 <CommandItem>Settings</CommandItem>
                             </CommandGroup>
-                        </CommandList>
-                    )}
+                        </CommandList> */}
                 </Command>
                 <div className='mx-auto flex gap-3'>
                     <ShoppingCartOutlinedIcon />
