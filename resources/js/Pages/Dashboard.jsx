@@ -3,10 +3,9 @@ import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import Header from './Header';
 
-import banner1 from '../../../public/images/imgbanner1.webp'
-import banner2 from '../../../public/images/imgbanner2.webp'
 import ImageSlider from './ImageSlider';
-
+import OptionMenu from './OptionMenu';
+import DaftarProduk from './DaftarProduk';
  
 
 
@@ -47,17 +46,33 @@ function Dashboard() {
     const { auth } = usePage().props;
 
     return (
-        <div>
-
+        <div className='mx-0 my-0 p-0'>
             <Header auth={auth}/>
-            {/* <h1>Halo</h1>
+            <div className='flex justify-center pt-24'>
+                <ImageSlider />
+            </div>
+            <div className='mx-16 my-16'>
+                <OptionMenu/>
+            </div>
+                <hr className='h-2 bg-slate-200'/>
+            <div className='mx-16 mt-12'>
+                <DaftarProduk/>
+            </div>
+            <h1>Halo</h1>
             <LogoutButton />
             <h1>Selamat Datang, {auth.user?.first_name}!</h1>
             <p>Email: {auth.user?.email}</p>
-            <p>Username: {auth.user?.username}</p> */}
-            <div className='flex justify-center mt-4'>
-                <ImageSlider />
-            </div>
+            <p>Username: {auth.user?.username}</p>
+            <h1>Halo</h1>
+            <LogoutButton />
+            <h1>Selamat Datang, {auth.user?.first_name}!</h1>
+            <p>Email: {auth.user?.email}</p>
+            <p>Username: {auth.user?.username}</p>
+            <h1>Halo</h1>
+            <LogoutButton />
+            <h1>Selamat Datang, {auth.user?.first_name}!</h1>
+            <p>Email: {auth.user?.email}</p>
+            <p>Username: {auth.user?.username}</p>
         </div>
     );
 }
