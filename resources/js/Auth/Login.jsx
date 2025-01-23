@@ -189,7 +189,7 @@ const Login = () => {
         
         <h1 className="font-bold text-2xl">Masuk Sekarang</h1>
         <p>
-          Belum punya aku Ambashop?{" "}
+          Belum punya aku Ambashop?
           <Link href="/register" className="text-blue-800">
             Buat Akun
           </Link>

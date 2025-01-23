@@ -5,6 +5,46 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+
+
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+  } from "@/components/ui/form";
+  import { Input } from "@/components/ui/input";
+
+  import { Label } from "@/components/ui/label"
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog"
+
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -14,7 +54,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-  } from "@/components/ui/popover"
+} from "@/components/ui/popover"
   
 
 import {
@@ -27,13 +67,37 @@ import {
     CommandSeparator,
 } from '@/components/ui/command';
 
+const formSchema = z
+.object({
+    email: z.string().email({ message: "Format email tidak valid." }),
+    password: z
+    .string()
+    .min(8, { message: "Password harus memiliki minimal 8 karakter." })
+    .regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
+        message: "Password harus memiliki huruf besar, angka, dan karakter khusus.",
+    }),
+});
+
 
 function Header({ auth }) {
     const [searchTerm, setSearchTerm] = useState('');
 
+    const form = useForm({
+        resolver: zodResolver(formSchema),
+        mode: "onChange",
+        criteriaMode: "all",
+        defaultValues: {
+          product: "",
+          price: "",
+          explanation: "",
+        },
+    });
+
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
+
+
 
     return (
         <div>
@@ -58,10 +122,78 @@ function Header({ auth }) {
                 <div className='flex mx-auto gap-4'>
                     {auth.user && (
                         <>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <StorefrontIcon/>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 ">
+                                    <p className='text-center text-slate-800 font-bold border border-black-100 rounded-xl py-2 mb-2'>Marketplace</p>
+                                    <div className='flex flex-col items-start '>
+                                        <Link className='font-semibold'>Profil</Link>
+                                        <Link className='font-semibold'>Kotak Masuk</Link>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <button className='mt-4 font-semibold'>Tambah Produk</button>
+                                            </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                   <Form {...form}>
+                                                    <form onSubmit={form.handleSubmit()} className="space-y-2">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="product"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                               <FormLabel>Apa yang anda jual</FormLabel>
+                                                                <FormControl>
+                                                                    <Input  className="bg-slate-100" {...field} />
+                                                                </FormControl>
+                                                            </FormItem>
+                                                        )}
+                                                        />
+                                                        <FormField
+                                                        control={form.control}
+                                                        name="price"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                               <FormLabel>Harga(Rp)</FormLabel>
+                                                                <FormControl>
+                                                                    <Input placeholder="0" className="bg-slate-100" {...field} />
+                                                                </FormControl>
+                                                            </FormItem>
+                                                        )}
+                                                        />
+                                                        <FormField
+                                                        control={form.control}
+                                                        name="explanation"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                               <FormLabel>Keterangan</FormLabel>
+                                                                <FormControl>
+                                                                    <Input placeholder="shadcn" className="bg-slate-100" {...field} />
+                                                                </FormControl>
+                                                            </FormItem>
+                                                        )}
+                                                        />
+                                                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                            <Label htmlFor="picture">Picture</Label>
+                                                            <Input id="picture" className='bg-slate-100' type="file" />
+                                                        </div>
+                                                        <div className='!mt-8'>
+                                                            <Link type="submit"
+                                                                className='bg-purple-500 rounded rounded-[1vw] text-white font-sans py-3 px-5'
+                                                            >Kirim</Link>
+                                                        </div>
+                                                    </form>
+                                                    </Form>
+                                                </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                             <FavoriteBorderIcon/>
                             <NotificationsNoneOutlinedIcon />
                             <MailOutlineOutlinedIcon />
-                        </>
+                       </>
                     )}
                 </div>
                 <div
