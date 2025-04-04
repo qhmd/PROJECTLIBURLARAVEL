@@ -44,7 +44,6 @@ function LogoutButton() {
 
 function Dashboard() {
     const { auth } = usePage().props;
-
     return (
         <div className='mx-0 my-0 p-0'>
             <Header auth={auth}/>
@@ -58,22 +57,10 @@ function Dashboard() {
             <div className='mx-16 mt-12'>
                 <DaftarProduk/>
             </div>
-            <h1>Halo</h1>
-            <LogoutButton />
-            <h1>Selamat Datang, {auth.user?.first_name}!</h1>
-            <p>Email: {auth.user?.email}</p>
-            <p>Username: {auth.user?.username}</p>
-            <h1>Halo</h1>
-            <LogoutButton />
-            <h1>Selamat Datang, {auth.user?.first_name}!</h1>
-            <p>Email: {auth.user?.email}</p>
-            <p>Username: {auth.user?.username}</p>
-            <h1>Halo</h1>
-            <LogoutButton />
-            <h1>Selamat Datang, {auth.user?.first_name}!</h1>
-            <p>Email: {auth.user?.email}</p>
-            <p>Username: {auth.user?.username}</p>
-        </div>
+            <div className='mt-12'>
+                <p>Footer</p>
+            </div>
+    </div>
     );
 }
 

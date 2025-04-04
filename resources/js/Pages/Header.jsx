@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import logo from '../../../public/images/logo.png';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
@@ -7,6 +7,8 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, router } from "@inertiajs/react";
+import { Textarea } from "@/components/ui/textarea"
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -37,18 +39,9 @@ import {
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
 
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-import { Link } from '@inertiajs/react';
 
 import {
     Popover,
@@ -57,30 +50,33 @@ import {
 } from "@/components/ui/popover"
   
 
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-} from '@/components/ui/command';
-
-const formSchema = z
-.object({
-    email: z.string().email({ message: "Format email tidak valid." }),
-    password: z
-    .string()
-    .min(8, { message: "Password harus memiliki minimal 8 karakter." })
-    .regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
-        message: "Password harus memiliki huruf besar, angka, dan karakter khusus.",
-    }),
+const formSchema = z.object({
+    product: z.string().min(1, { message: "Kolom ini harus diisi." }), // Validasi string tidak kosong
+    price: z
+      .string().min(1, { message : "Kolom ini harus diisi." }),
+    explanation: z.string().min(1, { message: "Kolom ini harus diisi." }), // Validasi string tidak kosong
+    picture: z.array(z.string()) // Validasi sebagai array string (bisa diubah ke File jika perlu)
+    .min(1, { message: "Minimal satu gambar harus diunggah." }), // Pastikan array tidak kosong
 });
 
-
 function Header({ auth }) {
+    const [errorMessage, setErrorMessage] = useState(null); // Untuk menyimpan pesan error
+
+    const [processing, setProcessing] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [images, setImages] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const handleClose = () => {
+        setIsVisible(false);
+      };
+      
+      const [saveImages, setSaveImages] = useState([]);
+
+      useEffect(() => {
+        form.setValue("picture", images.map(img => img.preview)); 
+    }, [images]);
+    
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -90,15 +86,64 @@ function Header({ auth }) {
           product: "",
           price: "",
           explanation: "",
+          picture: saveImages,
         },
     });
+
+
+    const handleImageChange = (e) => {
+        const files = Array.from(e.target.files);
+        
+        files.forEach(file => {
+            const reader = new FileReader();
+            
+            reader.onload = (event) => {
+                const base64String = event.target.result;
+                const newImage = {
+                    preview: base64String,
+                    id: Date.now() + Math.random(),
+                    name: file.name
+                };
+                // Add to state
+                setImages(prev => [...prev, newImage]);
+                
+                // Save to localStorage
+                const savedImages = JSON.parse(localStorage.getItem('savedImages') || '[]');
+                savedImages.push(newImage);
+                localStorage.setItem('savedImages', JSON.stringify(savedImages));
+            };
+            
+            reader.readAsDataURL(file);
+        });
+    };
+      const handleRemoveImage = (id) => {
+        setImages((prev) => prev.filter((image) => image.id !== id));
+      };
+    
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
-
-
-
+    const onSubmit = (data) => {
+        console.log(data);
+        setProcessing(true);
+        router.post(
+          "/posts/create",data,
+          {
+            onError: (errors) => {
+              const errorMessage = errors
+                ? Object.values(errors).flat().join(", ")
+                : "Terjadi Kesalahan Jaringan";
+                console.error(errorMessage)
+              setErrorMessage(errorMessage);
+            },
+            onSuccess: () => {
+                console.log("Success")
+            },
+            onFinish: () => setProcessing(false), // Reset state processing
+          }
+        );
+      };
     return (
         <div>
             <div className='flex items-center h-20 font-sans w-full bg-white border border-black-500 z-50 fixed'>
@@ -136,8 +181,11 @@ function Header({ auth }) {
                                                 <button className='mt-4 font-semibold'>Tambah Produk</button>
                                             </AlertDialogTrigger>
                                                 <AlertDialogContent>
+                                                    <AlertDialogCancel className='absolute p-4 border border-red-500 rounded rounded-none right-1 top-1 rounded rounded-[5px]'>
+                                                        X
+                                                    </AlertDialogCancel>
                                                    <Form {...form}>
-                                                    <form onSubmit={form.handleSubmit()} className="space-y-2">
+                                                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
                                                     <FormField
                                                         control={form.control}
                                                         name="product"
@@ -147,6 +195,7 @@ function Header({ auth }) {
                                                                 <FormControl>
                                                                     <Input  className="bg-slate-100" {...field} />
                                                                 </FormControl>
+                                                                <FormMessage/>
                                                             </FormItem>
                                                         )}
                                                         />
@@ -157,8 +206,9 @@ function Header({ auth }) {
                                                             <FormItem>
                                                                <FormLabel>Harga(Rp)</FormLabel>
                                                                 <FormControl>
-                                                                    <Input placeholder="0" className="bg-slate-100" {...field} />
+                                                                    <Input placeholder="0" className="bg-slate-100 border border-gray-300 rounded-lg text-sm p-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" type='number' min='0' {...field} />
                                                                 </FormControl>
+                                                                <FormMessage/>
                                                             </FormItem>
                                                         )}
                                                         />
@@ -169,19 +219,63 @@ function Header({ auth }) {
                                                             <FormItem>
                                                                <FormLabel>Keterangan</FormLabel>
                                                                 <FormControl>
-                                                                    <Input placeholder="shadcn" className="bg-slate-100" {...field} />
+                                                                    <Textarea
+                                                                        {...field}className='resize-none h-36'
+                                                                    />
                                                                 </FormControl>
+                                                                <FormMessage/>
                                                             </FormItem>
                                                         )}
                                                         />
                                                         <div className="grid w-full max-w-sm items-center gap-1.5">
-                                                            <Label htmlFor="picture">Picture</Label>
-                                                            <Input id="picture" className='bg-slate-100' type="file" />
+
+                                                        <FormField
+                                                        control={form.control}
+                                                        name="picture"
+                                                        render={({ field }) => (
+                                                            <FormItem>                                                          
+                                                                <FormControl>
+                                                                    <div>
+                                                                    <Label htmlFor="picture">Picture</Label>
+                                                                        <Input 
+                                                                            id="picture"
+                                                                            className='bg-slate-100'
+                                                                            type="file"
+                                                                            accept="image/*"
+                                                                            multiple
+                                                                            onChange={handleImageChange}
+                                                                        />
+                                                                    <p className='text-slate-500 text-xs'><span className='text-red-500'>*</span>Anda bisa memasukkan lebih dari 1 gambar</p>
+                                                                </div>
+                                                                    </FormControl>
+                                                                <FormMessage/>
+                                                            </FormItem>
+                                                        )}
+                                                        />
+                                                            
+                                                        </div>
+                                                        <div className="flex gap-4 flex-wrap mt-4">
+                                                            {images.map((img) => (
+                                                            <div key={img.id} className="relative w-24 h-24">
+                                                                <img
+                                                                src={img.preview}
+                                                                alt="preview"
+                                                                className="w-full h-full object-cover border rounded"
+                                                                />
+                                                                {/* Tombol Close */}
+                                                                <button
+                                                                onClick={() => handleRemoveImage(img.id)}
+                                                                className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow"
+                                                                >
+                                                                ×
+                                                                </button>
+                                                            </div>
+                                                            ))}
                                                         </div>
                                                         <div className='!mt-8'>
-                                                            <Link type="submit"
-                                                                className='bg-purple-500 rounded rounded-[1vw] text-white font-sans py-3 px-5'
-                                                            >Kirim</Link>
+                                                            <button type="submit"
+                                                                className='bg-purple-500 rounded rounded-[1vw] font-semibold text-white font-sans py-2 px-5'
+                                                            >Kirim</button>
                                                         </div>
                                                     </form>
                                                     </Form>

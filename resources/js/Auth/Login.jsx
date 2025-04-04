@@ -100,8 +100,9 @@ export function ProfileLogin() {
   });
 
   const onSubmit = (data) => {
-    setProcessing(true);
+    setd(true);
     setErrorMessage(null); // Reset pesan error sebelum mencoba login
+    
 
     // Gunakan Inertia.post untuk mengirim data login
     router.post(
@@ -114,7 +115,7 @@ export function ProfileLogin() {
             : "Terjadi Kesalahan Jaringan";
           setErrorMessage(errorMessage);
         },
-        onFinish: () => setProcessing(false), // Reset state processing
+        onFinish: () => setd(false), // Reset state d
       }
     );
   };

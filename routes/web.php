@@ -7,8 +7,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
-
 use App\Http\Controllers\Auth\DataUsersController;
+use App\Http\Controllers\Home\PostController;
 use App\Http\Controllers\Home\DashboardController;
 
 Route::get('/', function () {
@@ -48,6 +48,8 @@ Route::get('/auth/google/redirect', [RegisterController::class, 'redirectToGoogl
 
 // Route untuk callback dari Google
 Route::get('/auth/google/callback', [RegisterController::class, 'handleGoogleCallback']);
+
+Route::post('/posts/create',[PostController::class, 'store']);
 
 Route::get('/dashboard', [DashboardController::class, 'index']);
 
